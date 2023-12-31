@@ -1,0 +1,34 @@
+#!/usr/bin/env -S guile -e main -s
+!#
+
+(use-modules (ice-9 ftw)
+             (srfi srfi-41))
+(define STDOUT (current-output-port))
+(define STDIN (current-input-port))
+
+;; list files in test directory
+;; define enviroment variables
+;; call guile with proper arguments
+;; denote return signal
+;; return progress
+
+(define test-dir (string-append (getcwd) "/tests"))
+
+;; load path is list of strings
+;; file system tree returns tree which contain a tree
+;; node: name stat chidren(list of nodes)
+
+(define test-load-path (cons (string-append (getcwd) "/src") %load-path))
+
+(define test-files (list-ref (file-system-tree test-dir) 2))
+
+(define (main args)
+  (map (lambda (node)
+         (if (string? node)
+             (let ((file (string-append test-dir "/" node)))
+               (if (access? file R_OK)
+                   (begin (close-port (open-input-file file))
+                          (format STDOUT "Opened File: ~s" file))
+                   (format STDOUT "Could not access file!: ~s\n" file )))
+             #f))
+       test-files))

@@ -1,0 +1,93 @@
+#+TITLE: CXI Knuth MIX Virtual Machine, Assembler and Library
+#+AUTHOR: Caesar X Insanium
+
+* Purpose
+
+Third attempt at creating a library for dealing with the fictional machine known
+as the MIX machine that is explained in the book series "Art of Computer Programming".
+
+This will be done in the GNU Guile programming language. It is the only language
+that I know how to program in and written inside of Emacs.
+
+There is another MIX simulator available known as the GNU MDK. It is written in C
+as far as I can tell and includes an assembler, virtual machine, virtual machine
+GTK frontend, GNU Guile interpreter that runs on MDK VM, and Emacs lisp code for
+editing this stuff.
+
+I will only try to match the execution of programins written in the MIX assembly
+language. I will not try to match whatever their internal implementation is.
+
+Thankfully the MDK manual contain a sort of specification that I can match my own
+implementation against.
+
+* Architecture Brainstorming
+
+There needs to be 3 components. The assembler, virtual machine, and the relevant
+library. And so there will be 2 scripts in the bin directory. I think I will begin
+worl on the virtual machine first. Since it is described first in the book.
+
+** Assembler
+
+Takes MIX assembly code an generates a binary file that complies with the MIX specification
+that is described in the books.
+
+*** Tokenizer
+
+*** Lexer
+
+*** Code Generation
+
+** Virtual Machine
+
+Load MIX binary files and executes the instructions that are found in those files.
+
+*** Bytes, Words
+
+In scheme there exists a datatype, =bitvector= it will be the basis for everything.
+Words can be a list of bitvectors or a bitvector itself.
+
+#+begin_comment
+If I implement it as a list of bitvectors, then storing the bits in a file becomes
+more of a pain.
+#+end_comment
+
+- =make-byte= generate a valid MIX byte, 6 bits with init argument setting the bits
+  a default value, follow the architecture decisions of GNU Guile
+- =make-word= generate MIX Word plus the sign bit
+- =subfield= takes value F, \(F = 8*L + R \) or pair denoting L and R
+
+*** CPU
+
+Constains registers which are just words.
+
+*** File Loader
+
+*** Memory
+
+
+*** Registers
+
+*** Execution Loop
+
+Fetch, load, execute.
+
+* Installation/Distribution Notes
+
+A lot of this information can be verified by consulting the Guile Reference Manual.
+One might as why not use "Guile Hall" or "Akku". Answer is one is a R7RS package
+manager and the other I could not get to work no matter what I tried. Also it is
+barely maintained. Maybe it works inside of GNU Guix system installation.
+
+- organize the scheme files byte using the information detailed in [[info:guile#Installing Site Packages][Installing Site Packages]]
+  of the Guile Reference Manual
+  - scheme files go to =$prefix/share/guile= where =$prefix= is install location
+    such as =/usr=
+  - relevant variable is =%site-dir=
+  - compiled go files go to =%site-dir/site-ccache=
+  - relevant variable is =%site-ccache-dir=
+
+The directories in this repository are
+
+- =src= scheme source files, this is the library MIX
+- =bin= script files that meant for end user
+- =cache= compiled files, doubt that it will be used
