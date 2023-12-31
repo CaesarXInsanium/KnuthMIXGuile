@@ -2,8 +2,7 @@
   #:export (hello-world
             add))
 
-(define (hello-word)
-  (display "Hello World!")
-  (newline))
+(define (hello-world)
+  (+ 1 0))
 
 (define (add a) (+ a 1))

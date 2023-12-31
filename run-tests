@@ -12,7 +12,11 @@
 ;; denote return signal
 ;; return progress
 
-(define test-dir (string-append (getcwd) "/tests"))
+(define (full-path dir)
+  (string-append (getcwd) "/" dir))
+
+(define test-dir (full-path "tests"))
+(define src-dir (full-path "src"))
 
 ;; load path is list of strings
 ;; file system tree returns tree which contain a tree
@@ -20,9 +24,25 @@
 
 (define test-load-path (cons (string-append (getcwd) "/src") %load-path))
 
-(define test-files (list-ref (file-system-tree test-dir) 2))
+;; we get a tree described in [[info:guile#File Tree Walk][guile#File Tree Walk]]
+(define test-tree (file-system-tree test-dir))
+(define test-files (map (lambda (entry)
+                          (car entry))
+                        ;; skip the first to entries in the list, to get the children
+                        (cddr test-tree)))
 
-(define (main args)
+;; should expect full file for both
+(define (gen-guile-args load-path file)
+  (list "guile" "--debug" "-L" load-path "-s" file))
+
+
+(define (run-test-file file)
+  (format STDOUT "Running Tests inside : ~s~%" file)
+  (apply system* (gen-guile-args src-dir
+                                 ;; give full path to file
+                                 (string-append test-dir "/" file))))
+
+(define (main01 args)
   (map (lambda (node)
          (if (string? node)
              (let ((file (string-append test-dir "/" node)))
@@ -32,3 +52,9 @@
                    (format STDOUT "Could not access file!: ~s\n" file )))
              #f))
        test-files))
+
+(define (main args)
+  (define test-results  (map (lambda (file)
+                               (run-test-file file))
+                             test-files))
+  (format STDOUT "Test Result: ~s~%" test-results))
