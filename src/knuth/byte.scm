@@ -44,6 +44,17 @@
 (define (bit4 b) (vector-ref b 4))
 (define (bit5 b) (vector-ref b 5))
 
+;; settters
+(define (set-bit0 b x) (vector-set! b 0 x))
+(define (set-bit1 b x) (vector-set! b 1 x))
+(define (set-bit2 b x) (vector-set! b 2 x))
+(define (set-bit3 b x) (vector-set! b 3 x))
+(define (set-bit4 b x) (vector-set! b 4 x))
+(define (set-bit5 b x) (vector-set! b 5 x))
+
+;;; TODO
+;; bit shift
+;; boolean operators
 
 (export make-byte
         byte

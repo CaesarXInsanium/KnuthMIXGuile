@@ -3,7 +3,7 @@
 
 ;; Constructors
 
-(define (make-word init)
+(define-public (make-word init)
   (vector init
           (make-byte init)
           (make-byte init)
@@ -22,8 +22,6 @@
 (define (byted b) (vector-ref b 4))
 (define (bytee b) (vector-ref b 5))
 
-(define (word-fspec))
-
 ;; l i slow byte and r high byte
 (define (fspec l r) (+ (* 8 l) r))
 
@@ -36,11 +34,15 @@
                          (cons l r)))
                      (list 1 2 3 4 5 6)))))
 
+(define (word-fspec w int)
+  (let ((f (cepsf int)))
+    (vector-copy w (car f) (cdr f))))
+
 ;; Predicates
-(define (word? word)
-  (and (vector? word)
-       (= (vector-length word) 6)
-       (number? (word-sign word))))
+(define (word? w)
+  (and (vector? w)
+       (= (vector-length w) 6)
+       (number? (word-sign w))))
 
 (define (word=? a b)
   (and (word? a)
@@ -56,6 +58,8 @@
         word
         word?
         word=?
+        fspec
+        cepsf
         word-sign
         bytea
         byteb

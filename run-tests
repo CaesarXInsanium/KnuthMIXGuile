@@ -42,16 +42,6 @@
                                  ;; give full path to file
                                  (string-append test-dir "/" file))))
 
-(define (main01 args)
-  (map (lambda (node)
-         (if (string? node)
-             (let ((file (string-append test-dir "/" node)))
-               (if (access? file R_OK)
-                   (begin (close-port (open-input-file file))
-                          (format STDOUT "Opened File: ~s" file))
-                   (format STDOUT "Could not access file!: ~s\n" file )))
-             #f))
-       test-files))
 
 (define (main args)
   (define test-results  (map (lambda (file)

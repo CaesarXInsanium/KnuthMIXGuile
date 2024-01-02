@@ -28,4 +28,6 @@
 (test-end "word-comparison")
 
 (test-begin "fspec")
+(test-equal 11 (fspec 1 3))
+(test-equal (cons 1 3) (cepsf 11))
 (test-end "fspec")
