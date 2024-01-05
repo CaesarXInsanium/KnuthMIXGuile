@@ -1,59 +1,49 @@
-;; (use-modules (srfi srfi-1))
-
+;; designed to be prefixed with MIX:
 (define-module (knuth byte))
+(use-modules (srfi srfi-60))
 
 ;; TODO: might have to change the internal representation of bytes
+;; now i have to revert these changes, because they work now
 ;; constructors
-(define (bit? x) (or (= 1 x) (= 0 x)))
+(define (zero-or-one a) (or (= 1 a) (= 0 a)))
+(define bit? (lambda (b) (or (boolean? b) (zero-or-one b))))
 
-(define (byte a b c d e f)
-  (vector a b c d e f))
+(define (string->bits a)
+  (list->bitvector (map (lambda (d)
+                          (char=? d #\1))
+                        (string->list a))))
 
-(define (string->bits a) (error "Not Implemented!"))
+(define (byte b)
+  (cond ((string? b) (string->bits b))
+        ((and (bitvector? b) (= 6 (bitvector-length b))) b)
+        (else (error (format #f "Incorrectly sized bitvector: bt ~s len ~s ~%" b (bitvector-length b))))))
 
-(define (byte . a)
-  (if (and (= 6 (length a))
-           (string? (car a)))
-      (string->bits (car a))
-      (list->vector a)))
-
+;; init is a boolean
 (define (make-byte init)
-  (if (bit? init)
-      (make-vector 6 init)
-      (error (format #f "~s is not a 0 or 1~%" init))))
-
+  (make-bitvector 6 init))
 
 ;; predicates
 (define (byte? a)
-  (and (vector? a)
-       (= 6 (vector-length a))
-       (= 6 (length (filter (lambda (x) (bit? x))
-                            (vector->list a))))))
-(use-modules (srfi srfi-43))
+  (format (current-output-port) "Bitvector: (~s)~%" a)
+  (and (bitvector? a)
+       (= 6 (bitvector-length a))))
+
 (define (byte=? a b)
-  (and (byte? a)
-       (byte? b)
-       (vector= = a b)))
+  (= (list->integer (bitvector->list a))
+     (list->integer (bitvector->list b))))
 
 
 ;; getters
-(define (bit0 b) (vector-ref b 0))
-(define (bit1 b) (vector-ref b 1))
-(define (bit2 b) (vector-ref b 2))
-(define (bit3 b) (vector-ref b 3))
-(define (bit4 b) (vector-ref b 4))
-(define (bit5 b) (vector-ref b 5))
+(define (bit0 b) (bitvector-bit-set? b 0))
+(define (bit1 b) (bitvector-bit-set? b 1))
+(define (bit2 b) (bitvector-bit-set? b 2))
+(define (bit3 b) (bitvector-bit-set? b 3))
+(define (bit4 b) (bitvector-bit-set? b 4))
+(define (bit5 b) (bitvector-bit-set? b 5))
 
-;; settters
-(define (set-bit0 b x) (vector-set! b 0 x))
-(define (set-bit1 b x) (vector-set! b 1 x))
-(define (set-bit2 b x) (vector-set! b 2 x))
-(define (set-bit3 b x) (vector-set! b 3 x))
-(define (set-bit4 b x) (vector-set! b 4 x))
-(define (set-bit5 b x) (vector-set! b 5 x))
 
 ;;; TODO
-;; bit shift
+;; bit shift, move to instructions section
 ;; boolean operators
 
 (export make-byte
